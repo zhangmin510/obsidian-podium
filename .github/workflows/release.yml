@@ -6,7 +6,10 @@ on:
       - "*"
 
 permissions:
-  contents: write
+  contents: write # create the release
+  id-token: write # sign attestations (Sigstore OIDC)
+  attestations: write # store attestations
+  artifact-metadata: write # record attested artifacts
 
 jobs:
   release:
@@ -37,6 +40,14 @@ jobs:
             echo "Tag ${GITHUB_REF_NAME} does not match manifest version $version" >&2
             exit 1
           fi
+
+      - name: Attest build provenance
+        uses: actions/attest@1e69f48acb82d1966a394da916b4c1698aa569d6 # v4.2.2
+        with:
+          subject-path: |
+            main.js
+            styles.css
+            manifest.json
 
       - name: Create release
         env:

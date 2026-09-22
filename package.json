@@ -1,6 +1,6 @@
 {
   "name": "obsidian-podium",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "private": true,
   "description": "Present any Markdown note as fullscreen slides in Obsidian.",
   "license": "MIT",

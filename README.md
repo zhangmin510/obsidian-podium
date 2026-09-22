@@ -56,6 +56,12 @@ slide-max-lines: 0     # 0 = 不续页，只缩放
 
 **手动**：从 [Releases](https://github.com/zhangmin510/obsidian-podium/releases) 下载 `main.js`、`manifest.json`、`styles.css`，放到 `<你的 vault>/.obsidian/plugins/podium/`，然后在 设置 → 第三方插件 中启用 Podium。
 
+**校验来源**：Release 中的文件都带有 GitHub 构建来源证明（artifact attestation），可以验证它们确实由本仓库源码经 GitHub Actions 构建：
+
+```bash
+gh attestation verify main.js -R zhangmin510/obsidian-podium
+```
+
 ## 与同类插件的区别
 
 - [Advanced Slides](https://github.com/mszturc/obsidian-advanced-slides) / Marp：功能强大，但需要按它们的格式写幻灯片。Podium 面向「现成的笔记直接讲」。

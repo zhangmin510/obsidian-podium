@@ -1,7 +1,7 @@
 {
   "id": "podium",
   "name": "Podium",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "minAppVersion": "1.4.0",
   "description": "Present any Markdown note as full-screen slides. Auto-splits by rules or headings, continues long sections, fits content to screen, and adds a laser pointer and pen.",
   "author": "zhangmin.name",
