@@ -1,5 +1,3 @@
-'use strict';
-
 /* Annotation state rules — pure, no DOM. */
 
 /** Opacity of a pen/highlighter stroke at `now`. Strokes still being drawn have `endedAt: null`. */
@@ -93,7 +91,7 @@ function trailOutline(samples, now, trailMs, maxWidth) {
   return { left, right };
 }
 
-module.exports = {
+export {
   inkAlpha,
   pruneStrokes,
   pruneTrail,

@@ -1,6 +1,4 @@
-'use strict';
-
-const {
+import {
   inkAlpha,
   pruneStrokes,
   pruneTrail,
@@ -8,7 +6,7 @@ const {
   normalizePoint,
   resampleTrail,
   trailOutline,
-} = require('./ink-model');
+} from './ink-model.js';
 
 const INK_COLORS = ['#ff3b30', '#ffcc00', '#34c759', '#0a84ff', '#af52de'];
 const LASER_TRAIL_MS = 450;
@@ -128,7 +126,7 @@ class InkLayer {
   }
 
   destroy() {
-    cancelAnimationFrame(this.frame);
+    window.cancelAnimationFrame(this.frame);
     this.canvas.remove();
   }
 
@@ -163,7 +161,7 @@ class InkLayer {
 
   schedule() {
     if (this.frame) return;
-    this.frame = requestAnimationFrame(() => {
+    this.frame = window.requestAnimationFrame(() => {
       this.frame = 0;
       this.draw();
     });
@@ -258,4 +256,4 @@ class InkLayer {
   }
 }
 
-module.exports = { InkLayer, INK_COLORS };
+export { InkLayer, INK_COLORS };

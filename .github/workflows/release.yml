@@ -21,6 +21,9 @@ jobs:
       - name: Install
         run: npm ci
 
+      - name: Lint (Obsidian review rules)
+        run: npm run lint
+
       - name: Test
         run: npm test
 

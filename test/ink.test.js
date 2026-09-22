@@ -1,8 +1,7 @@
-'use strict';
 // Run: npm test
-const test = require('node:test');
-const assert = require('node:assert');
-const {
+import test from 'node:test';
+import assert from 'node:assert';
+import {
   inkAlpha,
   pruneStrokes,
   pruneTrail,
@@ -11,7 +10,7 @@ const {
   normalizePoint,
   resampleTrail,
   trailOutline,
-} = require('../src/ink-model');
+} from '../src/ink-model.js';
 
 const FADE = { fade: true, holdMs: 2000, fadeMs: 1000 };
 const KEEP = { fade: false, holdMs: 2000, fadeMs: 1000 };

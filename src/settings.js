@@ -1,6 +1,4 @@
-'use strict';
-
-const { PluginSettingTab, Setting } = require('obsidian');
+import { PluginSettingTab, Setting } from 'obsidian';
 
 const DEFAULT_SETTINGS = Object.freeze({
   splitMode: 'auto', // auto | hr | heading | h1 | h2 | h3
@@ -55,7 +53,7 @@ class PodiumSettingTab extends PluginSettingTab {
 
     new Setting(containerEl)
       .setName('自动封面页')
-      .setDesc('笔记不以 H1 开头时，用 frontmatter title 或文件名生成封面页。')
+      .setDesc('笔记不以一级标题开头时，用 frontmatter 的 title 或文件名生成封面页。')
       .addToggle((t) => t.setValue(s.titleSlide).onChange((v) => save({ titleSlide: v })));
 
     new Setting(containerEl)
@@ -85,7 +83,7 @@ class PodiumSettingTab extends PluginSettingTab {
 
     new Setting(containerEl)
       .setName('笔迹自动消失')
-      .setDesc('开启：画笔 / 荧光笔松开后停留片刻再淡出。关闭：笔迹保留在当前页，按 E 清除，退出演示后丢弃。')
+      .setDesc('开启：画笔 / 荧光笔松开后停留片刻再淡出。关闭：笔迹保留在当前页，可用橡皮擦清除，退出演示后丢弃。')
       .addToggle((t) =>
         t.setValue(s.inkFade).onChange(async (v) => {
           await save({ inkFade: v });
@@ -120,4 +118,4 @@ class PodiumSettingTab extends PluginSettingTab {
   }
 }
 
-module.exports = { DEFAULT_SETTINGS, PodiumSettingTab };
+export { DEFAULT_SETTINGS, PodiumSettingTab };

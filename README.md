@@ -69,6 +69,7 @@ slide-max-lines: 0     # 0 = 不续页，只缩放
 ```bash
 npm install
 npm test          # 单元测试（分页、笔迹规则）
+npm run lint      # Obsidian 官方审核规则（eslint-plugin-obsidianmd）
 npm run build     # 生成 main.js
 npm run dev       # 监听 src/ 自动重新构建
 ```

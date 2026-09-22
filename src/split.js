@@ -1,5 +1,3 @@
-'use strict';
-
 /* Slide splitting — pure, no Obsidian dependency. */
 
 const SPLIT_MODES = ['auto', 'hr', 'heading', 'h1', 'h2', 'h3'];
@@ -11,7 +9,6 @@ const HEADING_RE = /^(#{1,6})\s+(.*?)\s*#*\s*$/;
 const MATH_RE = /^\s*\$\$\s*$/;
 const MEDIA_RE = /^\s*!\[/;
 const TABLE_DELIM_RE = /^\s*\|?\s*:?-+:?\s*(?:\|\s*:?-+:?\s*)*\|?\s*$/;
-const CELL_SPLIT_RE = /(?<!\\)\|/;
 // CJK / fullwidth characters take roughly two latin columns.
 const WIDE_CHAR_RE = /[ᄀ-ᅟ⺀-꓏가-힣豈-﫿︰-﹏＀-｠￠-￦]/g;
 // Display columns per rendered line: content is ~46em wide, a latin char is ~0.5em.
@@ -134,8 +131,23 @@ function isTableStart(lines, kinds, i, end) {
   );
 }
 
+/** Split a table row on unescaped `|`. No regex lookbehind: iOS < 16.4 can't parse it. */
 function splitCells(row) {
-  return row.trim().replace(/^\|/, '').replace(/(?<!\\)\|$/, '').split(CELL_SPLIT_RE);
+  let text = row.trim();
+  if (text.startsWith('|')) text = text.slice(1);
+  if (text.endsWith('|') && !text.endsWith('\\|')) text = text.slice(0, -1);
+  const cells = [];
+  let cell = '';
+  for (let i = 0; i < text.length; i++) {
+    if (text[i] === '|' && text[i - 1] !== '\\') {
+      cells.push(cell);
+      cell = '';
+    } else {
+      cell += text[i];
+    }
+  }
+  cells.push(cell);
+  return cells;
 }
 
 /**
@@ -319,4 +331,4 @@ function slideIndexForLine(slides, line) {
   return idx;
 }
 
-module.exports = { SPLIT_MODES, buildSlides, slideIndexForLine, isTitleOnly };
+export { SPLIT_MODES, buildSlides, slideIndexForLine, isTitleOnly };

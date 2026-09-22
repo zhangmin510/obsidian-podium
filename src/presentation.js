@@ -1,8 +1,6 @@
-'use strict';
-
-const { MarkdownRenderer, Component, setIcon } = require('obsidian');
-const { isTitleOnly } = require('./split');
-const { InkLayer } = require('./ink');
+import { MarkdownRenderer, Component, setIcon } from 'obsidian';
+import { isTitleOnly } from './split.js';
+import { InkLayer } from './ink.js';
 
 const MIN_ZOOM = 0.45;
 const MIN_TABLE_ZOOM = 0.6;
@@ -31,7 +29,7 @@ function placeTip(button, tip) {
   const width = tip.offsetWidth;
   const centred = b.left + b.width / 2 - width / 2;
   const left = Math.min(Math.max(centred, TIP_MARGIN_PX), window.innerWidth - width - TIP_MARGIN_PX);
-  tip.style.left = `${left - b.left}px`;
+  tip.setCssProps({ left: `${left - b.left}px` });
 }
 
 function stopEvent(e) {
@@ -57,7 +55,7 @@ class Presentation {
     const s = this.plugin.settings;
     const root = document.body.createDiv({ cls: 'mdp-overlay' });
     if (s.theme !== 'auto') root.addClass(`theme-${s.theme}`);
-    root.style.setProperty('--mdp-font-scale', String(s.fontScale));
+    root.setCssProps({ '--mdp-font-scale': String(s.fontScale) });
     this.root = root;
 
     this.stage = root.createDiv({ cls: 'mdp-stage' });
@@ -144,7 +142,7 @@ class Presentation {
   syncToolbar() {
     const tool = this.ink.tool;
     for (const b of this.toolButtons) b.el.toggleClass('is-active', b.id === tool);
-    this.colorButton.style.color = this.ink.color;
+    this.colorButton.setCssProps({ color: this.ink.color });
     for (const t of TOOLS) this.root.toggleClass(`tool-${t.id}`, t.id === tool);
     this.root.toggleClass('is-drawing', this.ink.isDrawingTool);
   }
@@ -191,7 +189,7 @@ class Presentation {
     this.blackout.removeClass('is-on');
     this.ink.setSlide(i);
     this.counter.setText(`${i + 1} / ${this.slides.length}`);
-    this.progress.style.width = `${((i + 1) / this.slides.length) * 100}%`;
+    this.progress.setCssProps({ width: `${((i + 1) / this.slides.length) * 100}%` });
     await this.render(i, forward);
   }
 
@@ -231,7 +229,7 @@ class Presentation {
 
   scheduleFit() {
     if (this.fitFrame) return;
-    this.fitFrame = requestAnimationFrame(() => {
+    this.fitFrame = window.requestAnimationFrame(() => {
       this.fitFrame = 0;
       this.fit();
     });
@@ -248,7 +246,7 @@ class Presentation {
     if (tables.length === 0) return;
     const columns = (t) => t.rows[0]?.cells.length || 0;
     for (const t of tables) {
-      t.style.zoom = '';
+      t.setCssProps({ zoom: '' });
       t.toggleClass('mdp-table-dense', columns(t) >= DENSE_TABLE_COLUMNS);
     }
     const textWidth = contentEl.clientWidth;
@@ -257,7 +255,7 @@ class Presentation {
     }
     const avail = contentEl.clientWidth;
     for (const t of tables) {
-      if (t.scrollWidth > avail) t.style.zoom = String(Math.max(MIN_TABLE_ZOOM, avail / t.scrollWidth));
+      if (t.scrollWidth > avail) t.setCssProps({ zoom: String(Math.max(MIN_TABLE_ZOOM, avail / t.scrollWidth)) });
     }
   }
 
@@ -265,7 +263,7 @@ class Presentation {
   fit() {
     const { slideEl, contentEl } = this;
     if (!slideEl || !contentEl) return;
-    contentEl.style.zoom = '1';
+    contentEl.setCssProps({ zoom: '1' });
     this.fitTables();
     const cs = getComputedStyle(slideEl);
     const availH = slideEl.clientHeight - parseFloat(cs.paddingTop) - parseFloat(cs.paddingBottom);
@@ -274,7 +272,7 @@ class Presentation {
     const needW = contentEl.scrollWidth;
     const zoom = Math.min(1, availH / Math.max(needH, 1), availW / Math.max(needW, 1));
     const clamped = Math.max(MIN_ZOOM, zoom);
-    contentEl.style.zoom = String(clamped);
+    contentEl.setCssProps({ zoom: String(clamped) });
     slideEl.toggleClass('is-overflow', zoom < MIN_ZOOM);
   }
 
@@ -372,7 +370,7 @@ class Presentation {
     this.closed = true;
     this.cleanups.forEach((fn) => fn());
     this.resizeObserver?.disconnect();
-    cancelAnimationFrame(this.fitFrame);
+    window.cancelAnimationFrame(this.fitFrame);
     window.clearTimeout(this.idleTimer);
     this.component?.unload();
     this.ink.destroy();
@@ -382,4 +380,4 @@ class Presentation {
   }
 }
 
-module.exports = { Presentation };
+export { Presentation };

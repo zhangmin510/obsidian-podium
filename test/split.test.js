@@ -1,8 +1,7 @@
-'use strict';
 // Run: npm test
-const test = require('node:test');
-const assert = require('node:assert');
-const { buildSlides, slideIndexForLine, isTitleOnly } = require('../src/split');
+import test from 'node:test';
+import assert from 'node:assert';
+import { buildSlides, slideIndexForLine, isTitleOnly } from '../src/split.js';
 
 const mds = (slides) => slides.map((s) => s.md);
 

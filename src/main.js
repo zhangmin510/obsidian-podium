@@ -1,9 +1,7 @@
-'use strict';
-
-const { Plugin, MarkdownView, Notice, TFile } = require('obsidian');
-const { buildSlides, slideIndexForLine } = require('./split');
-const { DEFAULT_SETTINGS, PodiumSettingTab } = require('./settings');
-const { Presentation } = require('./presentation');
+import { Plugin, MarkdownView, Notice, TFile } from 'obsidian';
+import { buildSlides, slideIndexForLine } from './split.js';
+import { DEFAULT_SETTINGS, PodiumSettingTab } from './settings.js';
+import { Presentation } from './presentation.js';
 
 class PodiumPlugin extends Plugin {
   async onload() {
@@ -99,4 +97,4 @@ class PodiumPlugin extends Plugin {
   }
 }
 
-module.exports = { default: PodiumPlugin };
+export default PodiumPlugin;
