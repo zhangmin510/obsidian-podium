@@ -1,0 +1,10 @@
+{
+  "name": "obsidian-podium",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Present any Markdown note as fullscreen slides in Obsidian.",
+  "license": "MIT",
+  "scripts": {
+    "test": "node --test test/split.test.js"
+  }
+}

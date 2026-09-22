@@ -1,0 +1,170 @@
+.mdp-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: var(--layer-modal, 50);
+  background: var(--background-primary);
+  color: var(--text-normal);
+  --mdp-font-scale: 1;
+  user-select: text;
+}
+
+.mdp-overlay:not(.controls-visible) {
+  cursor: none;
+}
+
+.mdp-stage {
+  position: absolute;
+  inset: 0;
+}
+
+.mdp-slide {
+  position: absolute;
+  inset: 0;
+  box-sizing: border-box;
+  padding: 6vh 7vw 8vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.mdp-slide.is-overflow {
+  overflow-y: auto;
+}
+
+/* margin:auto centers short slides but keeps tall ones anchored to the top */
+.mdp-content.markdown-rendered {
+  margin: auto;
+  width: 100%;
+  max-width: 46em;
+  font-size: calc(var(--mdp-font-scale) * clamp(16px, 1.75vw, 34px));
+  line-height: 1.55;
+}
+
+.mdp-content.markdown-rendered > :first-child {
+  margin-top: 0;
+}
+
+.mdp-content img,
+.mdp-content video {
+  max-height: 70vh;
+  object-fit: contain;
+}
+
+.mdp-content table {
+  font-size: 0.9em;
+}
+
+.mdp-slide.is-title {
+  text-align: center;
+}
+
+.mdp-slide.is-title .mdp-content h1 {
+  font-size: 2.6em;
+  line-height: 1.2;
+}
+
+.mdp-slide.is-title .mdp-content h2 {
+  font-size: 2em;
+}
+
+.mdp-slide.is-title .mdp-content :is(h1, h2, h3, h4, h5, h6) {
+  justify-content: center;
+}
+
+/* hide Obsidian's heading fold / copy chrome in slides */
+.mdp-content .heading-collapse-indicator,
+.mdp-content .collapse-indicator {
+  display: none;
+}
+
+.mdp-slide.enter-next {
+  animation: mdp-in-next 0.22s ease-out;
+}
+
+.mdp-slide.enter-prev {
+  animation: mdp-in-prev 0.22s ease-out;
+}
+
+@keyframes mdp-in-next {
+  from { opacity: 0; transform: translateX(2vw); }
+  to { opacity: 1; transform: none; }
+}
+
+@keyframes mdp-in-prev {
+  from { opacity: 0; transform: translateX(-2vw); }
+  to { opacity: 1; transform: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mdp-slide.enter-next,
+  .mdp-slide.enter-prev {
+    animation: none;
+  }
+}
+
+.mdp-blackout {
+  position: absolute;
+  inset: 0;
+  background: #000;
+  display: none;
+  z-index: 3;
+}
+
+.mdp-blackout.is-on {
+  display: block;
+}
+
+.mdp-progress {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  height: 3px;
+  width: 0;
+  background: var(--interactive-accent);
+  transition: width 0.25s ease;
+  z-index: 2;
+}
+
+.mdp-bar {
+  position: absolute;
+  right: 16px;
+  bottom: 14px;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 6px;
+  border-radius: 8px;
+  background: var(--background-secondary);
+  border: 1px solid var(--background-modifier-border);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.mdp-overlay.controls-visible .mdp-bar {
+  opacity: 0.92;
+}
+
+.mdp-bar button {
+  background: transparent;
+  box-shadow: none;
+  border: none;
+  color: var(--text-muted);
+  font-size: 16px;
+  padding: 2px 10px;
+  height: auto;
+  cursor: pointer;
+}
+
+.mdp-bar button:hover {
+  color: var(--text-normal);
+  background: var(--background-modifier-hover);
+}
+
+.mdp-counter {
+  font-variant-numeric: tabular-nums;
+  color: var(--text-muted);
+  font-size: 13px;
+  min-width: 4.5em;
+  text-align: center;
+}
