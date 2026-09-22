@@ -1,10 +1,15 @@
 {
   "name": "obsidian-podium",
-  "version": "0.1.1",
+  "version": "0.2.0",
   "private": true,
   "description": "Present any Markdown note as fullscreen slides in Obsidian.",
   "license": "MIT",
   "scripts": {
-    "test": "node --test test/split.test.js"
+    "test": "node --test \"test/*.test.js\"",
+    "build": "node esbuild.config.mjs",
+    "dev": "node esbuild.config.mjs --watch"
+  },
+  "devDependencies": {
+    "esbuild": "^0.28.2"
   }
 }

@@ -1,18 +1,8 @@
 'use strict';
-// Run: node --test test/split.test.js
+// Run: npm test
 const test = require('node:test');
 const assert = require('node:assert');
-const Module = require('module');
-
-const stub = class {};
-const originalLoad = Module._load;
-Module._load = function (request, ...rest) {
-  if (request === 'obsidian') {
-    return { Plugin: stub, PluginSettingTab: stub, Setting: stub, Component: stub, MarkdownView: stub, TFile: stub };
-  }
-  return originalLoad.call(this, request, ...rest);
-};
-const { buildSlides, slideIndexForLine, isTitleOnly } = require('../main.js');
+const { buildSlides, slideIndexForLine, isTitleOnly } = require('../src/split');
 
 const mds = (slides) => slides.map((s) => s.md);
 
@@ -100,4 +90,68 @@ test('slideIndexForLine maps cursor line to containing slide', () => {
 test('slide markers split like rules', () => {
   const slides = buildSlides('A\n<!-- slide -->\nB', { maxLines: 0 });
   assert.strictEqual(slides.length, 2);
+});
+
+/* ---------------- tables ---------------- */
+
+const table = (rows, cell = 'x') =>
+  ['| 名称 | 描述 | 状态 |', '|---|:---:|---|', ...Array.from({ length: rows }, (_, i) => `| r${i} | ${cell} | ok |`)].join('\n');
+
+test('long table is split across slides with the header row repeated', () => {
+  const slides = buildSlides(`## 大表格\n\n${table(40)}`, { maxLines: 18 });
+  const parts = slides.filter((s) => s.md.includes('| r'));
+  assert.ok(parts.length >= 3, `expected >=3 table slides, got ${parts.length}`);
+  for (const s of parts) {
+    assert.match(s.md, /\| 名称 \| 描述 \| 状态 \|\n\|---\|:---:\|---\|/);
+  }
+  const rows = parts.flatMap((s) => s.md.match(/\| r\d+ \|/g));
+  assert.strictEqual(rows.length, 40);
+  assert.strictEqual(new Set(rows).size, 40);
+  assert.match(parts[1].md, /^## 大表格（续）/);
+});
+
+test('table rows are spread evenly, no tiny last fragment', () => {
+  const cjk = '这是一段比较长的中文说明文字，用来测试表格单元格换行时的高度估算';
+  for (const cell of ['x', cjk + cjk]) {
+    const slides = buildSlides(`## T\n\n${table(40, cell)}`, { maxLines: 18 });
+    const counts = slides.map((s) => (s.md.match(/\| r\d+ \|/g) || []).length).filter(Boolean);
+    assert.ok(counts.length > 1, 'expected a split');
+    assert.ok(Math.max(...counts) - Math.min(...counts) <= 1, `uneven split: ${counts}`);
+  }
+});
+
+test('small table stays whole', () => {
+  const slides = buildSlides(`## T\n\n${table(5)}`, { maxLines: 18 });
+  assert.strictEqual(slides.length, 1);
+});
+
+test('table directly after a paragraph (no blank line) is its own block', () => {
+  const slides = buildSlides(`## T\n\n说明文字\n${table(40)}`, { maxLines: 18 });
+  assert.match(slides[0].md, /说明文字/);
+  const withIntro = slides.filter((s) => s.md.includes('说明文字'));
+  assert.strictEqual(withIntro.length, 1);
+  assert.ok(slides.filter((s) => s.md.includes('| r')).length >= 3);
+});
+
+test('tables are not split when continuation is off', () => {
+  const slides = buildSlides(`## T\n\n${table(40)}`, { maxLines: 0 });
+  assert.strictEqual(slides.length, 1);
+});
+
+test('table inside a code fence is left alone', () => {
+  const slides = buildSlides('## T\n\n```\n' + table(40) + '\n```', { maxLines: 18 });
+  assert.strictEqual(slides.length, 1);
+});
+
+test('cells too wide for one line make rows heavier (CJK counts double)', () => {
+  const cjk = '这是一段比较长的中文说明文字，用来测试表格单元格换行时的高度估算';
+  const short = buildSlides(`## T\n\n${table(30, 'x')}`, { maxLines: 18 });
+  const long = buildSlides(`## T\n\n${table(30, cjk + cjk)}`, { maxLines: 18 });
+  assert.ok(long.length > short.length, `cjk ${long.length} vs latin ${short.length}`);
+});
+
+test('escaped pipes inside cells do not add columns', () => {
+  const md = '| a | b |\n|---|---|\n' + Array.from({ length: 40 }, (_, i) => `| [[Note${i}\\|别名]] | v |`).join('\n');
+  const slides = buildSlides(`## T\n\n${md}`, { maxLines: 18 });
+  slides.forEach((s) => assert.match(s.md, /\| a \| b \|\n\|---\|---\|/));
 });

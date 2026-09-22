@@ -12,6 +12,8 @@
 - **Obsidian 原生渲染**：双链、嵌入、图片、Callout、数学公式、Mermaid、代码高亮都和阅读视图一致。
 - **自动封面页**：笔记不以 H1 开头时，用 frontmatter `title` 或文件名生成封面。
 - **从光标处开始**：从当前编辑位置所在的那一页开讲。
+- **表格友好**：表格字号跟随幻灯片（不受主题固定字号影响）；长表格按行分页并重复表头；宽表格自动占满页宽，只缩放表格本身。
+- **激光笔 / 画笔 / 荧光笔**：激光笔带渐隐残影；画笔和荧光笔默认松手后停留片刻淡出，也可以设为保留（按页分开，E 清除）。黑屏上也能画。
 
 ## 使用
 
@@ -28,9 +30,12 @@
 | 跳到第 N 页 | 输入数字 + 回车 |
 | 切换全屏 | F |
 | 黑屏 | B 或 `.` |
-| 退出 | Esc |
+| 激光笔 / 画笔 / 荧光笔 | L / P / H（再按一次关闭） |
+| 切换颜色 | C |
+| 清除本页笔迹 | E |
+| 退出 | Esc（有工具时先退出工具，再按退出演示） |
 
-触屏设备可左右滑动翻页。
+画笔模式下点击不会翻页，也不会打开链接；激光笔模式下点击照常翻页。触屏设备可左右滑动翻页（画笔模式下除外）。
 
 ### 单篇笔记覆盖设置
 
@@ -43,7 +48,7 @@ slide-max-lines: 0     # 0 = 不续页，只缩放
 
 ### 设置项
 
-分页方式、每页最大行数（默认 18）、自动封面页、配色（跟随 / 深色 / 浅色）、字号倍率、进度条。
+分页方式、每页最大行数（默认 18）、自动封面页、配色（跟随 / 深色 / 浅色）、字号倍率、进度条、笔迹自动消失（默认开）与停留时间（默认 2 秒）。
 
 ## 安装
 
@@ -59,13 +64,25 @@ slide-max-lines: 0     # 0 = 不续页，只缩放
 
 ## 开发
 
-纯 JavaScript，无构建步骤。
+源码在 `src/`，用 esbuild 打包成 `main.js`（`main.js` 是构建产物，不入库）。
 
 ```bash
-npm test   # 分页逻辑单元测试
+npm install
+npm test          # 单元测试（分页、笔迹规则）
+npm run build     # 生成 main.js
+npm run dev       # 监听 src/ 自动重新构建
 ```
 
-发布：更新 `manifest.json` / `versions.json` 版本号，推送同名 tag（如 `0.1.1`），GitHub Actions 自动创建 Release。
+| 文件 | 职责 |
+|---|---|
+| `src/split.js` | 分页（纯函数） |
+| `src/ink-model.js` | 笔迹淡出、残影、工具切换规则（纯函数） |
+| `src/ink.js` | 激光笔 / 画笔画布层 |
+| `src/presentation.js` | 全屏演示界面、键盘与指针交互、自适应缩放 |
+| `src/settings.js` | 默认设置与设置页 |
+| `src/main.js` | 插件入口、命令、菜单 |
+
+发布：更新 `manifest.json` / `versions.json` 版本号，推送同名 tag（如 `0.2.0`），GitHub Actions 测试、构建并自动创建 Release。
 
 ---
 
@@ -78,8 +95,10 @@ Present **any** Markdown note as fullscreen slides — no special syntax require
 - **Auto-fit**: remaining overflow is scaled down to fit the screen.
 - **Native rendering**: wikilinks, embeds, callouts, math, Mermaid and code highlighting render exactly as in reading view.
 - **Cover slide** from frontmatter `title` or file name; **start from cursor**.
+- **Tables**: text follows the slide size (ignores theme px sizes); long tables split by rows with the header repeated; wide tables use the full width.
+- **Laser pointer, pen, highlighter**: the laser leaves a fading trail; ink fades out shortly after the pen lifts (or stays per slide, cleared with `E`).
 
-Keys: →/Space next, ← previous, Home/End, number + Enter to jump, `F` fullscreen, `B` blackout, `Esc` exit.
+Keys: →/Space next, ← previous, Home/End, number + Enter to jump, `F` fullscreen, `B` blackout, `L` laser, `P` pen, `H` highlighter, `C` color, `E` erase slide ink, `Esc` leave tool / exit.
 
 Per-note overrides: `slide-split: auto | hr | heading | h1 | h2 | h3`, `slide-max-lines: <n>`.
 

@@ -50,8 +50,71 @@
   object-fit: contain;
 }
 
-.mdp-content table {
+/* ---- tables ---- */
+
+/*
+ * Themes size table text in fixed px (e.g. Blue Topaz: --table-text-size = font-text-size * 0.94),
+ * which stays tiny when slide text is scaled up. Everything here is relative to the slide font.
+ * The `.mdp-overlay .mdp-content.markdown-rendered` prefix outranks theme selectors.
+ */
+.mdp-overlay .mdp-content.markdown-rendered {
+  --table-text-size: 1em;
+  --table-header-size: 1em;
+}
+
+.mdp-slide.has-wide-table .mdp-content.markdown-rendered {
+  max-width: 100%;
+}
+
+.mdp-overlay .mdp-content.markdown-rendered table {
+  width: 100%;
+  margin: 0.9em 0;
   font-size: 0.9em;
+  line-height: 1.5;
+  border-collapse: collapse;
+  border: none;
+  background: transparent;
+}
+
+.mdp-overlay .mdp-content.markdown-rendered table.mdp-table-dense {
+  font-size: 0.75em;
+}
+
+.mdp-overlay .mdp-content.markdown-rendered table.mdp-table-dense :is(th, td) {
+  padding: 0.5em 0.55em;
+}
+
+.mdp-overlay .mdp-content.markdown-rendered :is(th, td) {
+  font-size: inherit;
+  padding: 0.6em 1em;
+  border: none;
+  border-bottom: 1px solid var(--background-modifier-border);
+  vertical-align: top;
+  overflow-wrap: break-word;
+}
+
+/* keep explicit column alignment (:---: / ---:) — only default the rest to start */
+.mdp-overlay .mdp-content.markdown-rendered th:not([align]):not([style*='text-align']) {
+  text-align: start;
+}
+
+.mdp-overlay .mdp-content.markdown-rendered th {
+  font-weight: var(--font-semibold, 600);
+  color: var(--text-normal);
+  background: transparent;
+  border-bottom: 2px solid var(--interactive-accent);
+}
+
+.mdp-overlay .mdp-content.markdown-rendered tr {
+  background: transparent;
+}
+
+.mdp-overlay .mdp-content.markdown-rendered tbody tr:nth-child(even) {
+  background: var(--background-secondary);
+}
+
+.mdp-overlay .mdp-content.markdown-rendered tbody tr:last-child td {
+  border-bottom: none;
 }
 
 .mdp-slide.is-title {
@@ -122,14 +185,14 @@
   width: 0;
   background: var(--interactive-accent);
   transition: width 0.25s ease;
-  z-index: 2;
+  z-index: 5;
 }
 
 .mdp-bar {
   position: absolute;
   right: 16px;
   bottom: 14px;
-  z-index: 2;
+  z-index: 5;
   display: flex;
   align-items: center;
   gap: 4px;
@@ -146,19 +209,99 @@
 }
 
 .mdp-bar button {
+  display: inline-flex;
+  align-items: center;
   background: transparent;
   box-shadow: none;
   border: none;
+  border-radius: 6px;
   color: var(--text-muted);
-  font-size: 16px;
-  padding: 2px 10px;
+  padding: 5px 8px;
   height: auto;
   cursor: pointer;
+}
+
+.mdp-bar button svg {
+  width: 16px;
+  height: 16px;
+}
+
+
+
+.mdp-bar button {
+  position: relative;
+}
+
+/* Tooltip: horizontal position is set on hover (placeTip) to keep it on screen. */
+.mdp-tip {
+  position: absolute;
+  left: 0;
+  bottom: calc(100% + 10px);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 2px 8px;
+  width: max-content;
+  max-width: 260px;
+  padding: 6px 10px;
+  border-radius: 6px;
+  background: var(--background-primary);
+  border: 1px solid var(--background-modifier-border);
+  box-shadow: var(--shadow-s, 0 2px 8px rgba(0, 0, 0, 0.15));
+  color: var(--text-normal);
+  font-size: 13px;
+  line-height: 1.4;
+  text-align: left;
+  white-space: normal;
+  pointer-events: none;
+  opacity: 0;
+  transform: translateY(4px);
+  transition: opacity 0.12s ease, transform 0.12s ease;
+}
+
+.mdp-bar button:hover .mdp-tip {
+  opacity: 1;
+  transform: none;
+  transition-delay: 0.3s;
+}
+
+.mdp-tip kbd {
+  font-family: var(--font-monospace);
+  font-size: 11px;
+  padding: 0 5px;
+  border-radius: 4px;
+  border: 1px solid var(--background-modifier-border);
+  background: var(--background-secondary);
+  color: var(--text-muted);
+}
+
+.mdp-tip-hint {
+  flex-basis: 100%;
+  color: var(--text-muted);
+  font-size: 12px;
+}
+
+.mdp-bar button.mdp-color svg {
+  fill: currentColor;
+}
+
+.mdp-bar-sep {
+  width: 1px;
+  align-self: stretch;
+  margin: 4px 4px;
+  background: var(--background-modifier-border);
 }
 
 .mdp-bar button:hover {
   color: var(--text-normal);
   background: var(--background-modifier-hover);
+}
+
+/* after :hover so the active tool stays highlighted under the mouse */
+.mdp-bar button.is-active,
+.mdp-bar button.is-active:hover {
+  color: var(--text-on-accent);
+  background: var(--interactive-accent);
 }
 
 .mdp-counter {
@@ -167,4 +310,40 @@
   font-size: 13px;
   min-width: 4.5em;
   text-align: center;
+}
+
+/* ---- annotation layer ---- */
+
+.mdp-ink {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 4;
+  pointer-events: none;
+}
+
+.mdp-overlay.is-drawing {
+  user-select: none;
+  touch-action: none;
+}
+
+.mdp-overlay.is-drawing,
+.mdp-overlay.is-drawing * {
+  cursor: crosshair;
+}
+
+/* the laser dot replaces the system cursor */
+.mdp-overlay.tool-laser,
+.mdp-overlay.tool-laser * {
+  cursor: none;
+}
+
+.mdp-overlay .mdp-bar,
+.mdp-overlay .mdp-bar * {
+  cursor: default;
+}
+
+.mdp-overlay .mdp-bar button {
+  cursor: pointer;
 }
